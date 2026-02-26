@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 import logging
 
 logger = logging.getLogger(__name__)
@@ -8,7 +9,7 @@ _firebase_initialized = False
 
 
 def init_firebase(credentials_path=None):
-    """Initialize Firebase Admin SDK from FIREBASE_CREDENTIALS env var or file."""
+    """Initialize Firebase Admin SDK from FIREBASE_CREDENTIALS_BASE64 env var or file."""
     global _firebase_initialized
     if _firebase_initialized:
         return True
@@ -17,9 +18,9 @@ def init_firebase(credentials_path=None):
         import firebase_admin
         from firebase_admin import credentials
 
-        creds_json = os.environ.get('FIREBASE_CREDENTIALS')
-        if creds_json:
-            cred_dict = json.loads(creds_json)
+        creds_b64 = os.environ.get('FIREBASE_CREDENTIALS_BASE64')
+        if creds_b64:
+            cred_dict = json.loads(base64.b64decode(creds_b64))
             cred = credentials.Certificate(cred_dict)
         elif credentials_path and os.path.exists(credentials_path):
             cred = credentials.Certificate(credentials_path)
