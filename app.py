@@ -68,7 +68,10 @@ def create_app():
 
 def _seed_if_empty():
     """Seed database with sample data only if no caregivers exist."""
-    if Caregiver.query.first() is not None:
+    try:
+        if Caregiver.query.first() is not None:
+            return
+    except Exception:
         return
 
     caregiver = Caregiver(name='سارة أحمد', email='sara@example.com', phone='0501234567')
@@ -118,8 +121,12 @@ def _seed_if_empty():
         Friend(patient_id=patient.id, name='عبدالله خالد', phone='0509876543', relationship='صديق'),
         Friend(patient_id=patient.id, name='فاطمة محمد', phone='0501111111', relationship='جارة'),
     ])
-    db.session.commit()
-    print("Database seeded with sample data!")
+    try:
+        db.session.commit()
+        print("Database seeded with sample data!")
+    except Exception:
+        db.session.rollback()
+        print("Seed skipped (data already exists).")
 
 
 # Gunicorn entry point
