@@ -12,6 +12,7 @@ def get_database_uri():
     # SQLAlchemy requires postgresql:// not postgres://
     if uri.startswith('postgres://'):
         uri = uri.replace('postgres://', 'postgresql://', 1)
+    print(f"[CONFIG] Using database: {uri[:30]}...")
     return uri
 
 
