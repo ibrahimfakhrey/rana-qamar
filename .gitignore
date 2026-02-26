@@ -15,16 +15,5 @@ serviceAccountKey.json
 *.json.bak
 .DS_Store
 node_modules/
-
-# Flutter
-mobile/.dart_tool/
-mobile/.packages
-mobile/.pub/
-mobile/build/
-mobile/.flutter-plugins
-mobile/.flutter-plugins-dependencies
-mobile/android/local.properties
-mobile/android/.gradle/
-mobile/android/app/google-services.json
-mobile/ios/Runner/GoogleService-Info.plist
-mobile/ios/Pods/
+mobile/
+backend/
