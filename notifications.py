@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 _firebase_initialized = False
 
 
-def init_firebase(credentials_path):
-    """Initialize Firebase Admin SDK from file or FIREBASE_CREDENTIALS env var."""
+def init_firebase(credentials_path=None):
+    """Initialize Firebase Admin SDK from FIREBASE_CREDENTIALS env var or file."""
     global _firebase_initialized
     if _firebase_initialized:
         return True
@@ -17,12 +17,11 @@ def init_firebase(credentials_path):
         import firebase_admin
         from firebase_admin import credentials
 
-        # Try env var first (for Railway), then file
         creds_json = os.environ.get('FIREBASE_CREDENTIALS')
         if creds_json:
             cred_dict = json.loads(creds_json)
             cred = credentials.Certificate(cred_dict)
-        elif os.path.exists(credentials_path):
+        elif credentials_path and os.path.exists(credentials_path):
             cred = credentials.Certificate(credentials_path)
         else:
             logger.warning("Firebase credentials not found. Push notifications disabled.")
