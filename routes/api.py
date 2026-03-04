@@ -19,7 +19,10 @@ def patient_login():
     if not patient or not patient.check_password(password):
         return jsonify({'error': 'Invalid credentials'}), 401
 
-    token = create_access_token(identity=str(patient.id))
+    token = create_access_token(
+        identity=str(patient.id),
+        additional_claims={'role': 'patient'}
+    )
     return jsonify({
         'token': token,
         'patient': _patient_profile(patient),

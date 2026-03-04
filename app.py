@@ -43,13 +43,16 @@ def create_app():
     from routes.auth import auth_bp
     from routes.caregiver import caregiver_bp
     from routes.api import api_bp
+    from routes.caregiver_api import caregiver_api_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(caregiver_bp)
     app.register_blueprint(api_bp)
+    app.register_blueprint(caregiver_api_bp)
 
     # Exempt API from CSRF
     csrf.exempt(api_bp)
+    csrf.exempt(caregiver_api_bp)
 
     # Create tables and seed on first run
     with app.app_context():

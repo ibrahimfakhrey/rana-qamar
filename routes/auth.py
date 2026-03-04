@@ -10,6 +10,11 @@ def index():
     return redirect(url_for('auth.login'))
 
 
+@auth_bp.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
