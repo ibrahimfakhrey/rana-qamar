@@ -83,7 +83,7 @@ def patient_delete(patient_id):
     return redirect(url_for('caregiver.dashboard'))
 
 
-@caregiver_bp.route('/delete-account', methods=['POST'])
+@caregiver_bp.route('/delete-account', methods=['GET', 'POST'])
 @login_required
 def delete_account():
     caregiver = db.session.get(Caregiver, current_user.id)
