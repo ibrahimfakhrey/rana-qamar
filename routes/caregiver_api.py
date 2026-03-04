@@ -84,6 +84,36 @@ def caregiver_profile():
     return jsonify(_caregiver_profile(caregiver))
 
 
+# ── Delete Account ────────────────────────────────────
+
+@caregiver_api_bp.route('/delete-account', methods=['DELETE'])
+@jwt_required()
+def delete_account():
+    caregiver = _get_current_caregiver()
+    if not caregiver:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    # Delete all patients and their nested data
+    for patient in caregiver.patients:
+        TaskLog.query.filter_by(patient_id=patient.id).delete()
+        Notification.query.filter_by(patient_id=patient.id).delete()
+        Medication.query.filter_by(patient_id=patient.id).delete()
+        Meal.query.filter_by(patient_id=patient.id).delete()
+        Activity.query.filter_by(patient_id=patient.id).delete()
+        WaterReminder.query.filter_by(patient_id=patient.id).delete()
+        Habit.query.filter_by(patient_id=patient.id).delete()
+        Friend.query.filter_by(patient_id=patient.id).delete()
+        db.session.delete(patient)
+
+    # Delete remaining notifications for this caregiver
+    Notification.query.filter_by(caregiver_id=caregiver.id).delete()
+
+    db.session.delete(caregiver)
+    db.session.commit()
+
+    return jsonify({'message': 'Account deleted successfully'})
+
+
 # ── Patient CRUD ──────────────────────────────────────
 
 @caregiver_api_bp.route('/patients')

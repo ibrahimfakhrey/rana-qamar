@@ -162,6 +162,27 @@ def update_fcm_token():
     return jsonify({'message': 'FCM token updated'})
 
 
+@api_bp.route('/patient/delete-account', methods=['DELETE'])
+@jwt_required()
+def delete_patient_account():
+    patient = _get_current_patient()
+    if not patient:
+        return jsonify({'error': 'Patient not found'}), 404
+
+    TaskLog.query.filter_by(patient_id=patient.id).delete()
+    Notification.query.filter_by(patient_id=patient.id).delete()
+    Medication.query.filter_by(patient_id=patient.id).delete()
+    Meal.query.filter_by(patient_id=patient.id).delete()
+    Activity.query.filter_by(patient_id=patient.id).delete()
+    WaterReminder.query.filter_by(patient_id=patient.id).delete()
+    Habit.query.filter_by(patient_id=patient.id).delete()
+    Friend.query.filter_by(patient_id=patient.id).delete()
+    db.session.delete(patient)
+    db.session.commit()
+
+    return jsonify({'message': 'Account deleted successfully'})
+
+
 @api_bp.route('/patient/caregiver-phone')
 @jwt_required()
 def caregiver_phone():

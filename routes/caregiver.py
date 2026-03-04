@@ -1,7 +1,7 @@
 from datetime import date
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_required, current_user
-from models import (db, Patient, Medication, Meal, Activity,
+from flask_login import login_required, current_user, logout_user
+from models import (db, Caregiver, Patient, Medication, Meal, Activity,
                     WaterReminder, Habit, Friend, TaskLog, Notification)
 
 caregiver_bp = Blueprint('caregiver', __name__)
@@ -81,6 +81,32 @@ def patient_delete(patient_id):
     db.session.commit()
     flash('Patient deleted.', 'success')
     return redirect(url_for('caregiver.dashboard'))
+
+
+@caregiver_bp.route('/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    caregiver = db.session.get(Caregiver, current_user.id)
+
+    # Delete all patients and their nested data
+    for patient in caregiver.patients:
+        TaskLog.query.filter_by(patient_id=patient.id).delete()
+        Notification.query.filter_by(patient_id=patient.id).delete()
+        Medication.query.filter_by(patient_id=patient.id).delete()
+        Meal.query.filter_by(patient_id=patient.id).delete()
+        Activity.query.filter_by(patient_id=patient.id).delete()
+        WaterReminder.query.filter_by(patient_id=patient.id).delete()
+        Habit.query.filter_by(patient_id=patient.id).delete()
+        Friend.query.filter_by(patient_id=patient.id).delete()
+        db.session.delete(patient)
+
+    Notification.query.filter_by(caregiver_id=caregiver.id).delete()
+    logout_user()
+    db.session.delete(caregiver)
+    db.session.commit()
+
+    flash('Your account has been deleted.', 'success')
+    return redirect(url_for('auth.login'))
 
 
 @caregiver_bp.route('/notifications/mark-read', methods=['POST'])
